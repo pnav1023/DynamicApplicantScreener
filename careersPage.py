@@ -1,9 +1,6 @@
 import streamlit as st
-from openai import OpenAI
 from dotenv import load_dotenv
-import os
-from questionBank import questions, stream_questions
-import random
+from demo_data.conversation import stream_data
 
 # Set page layout to wide mode
 st.set_page_config(layout="wide")
@@ -30,13 +27,18 @@ jobs = [
     {"title": "Audiovisual Engineer, IT", "team": "IT", "location": "San Francisco"},
     {"title": "Backend Software Engineer, Leverage Engineering", "team": "Leverage Engineering", "location": "San Francisco"},
     {"title": "Communications Strategy & Operations Lead", "team": "Communications", "location": "San Francisco"},
+    {"title": "Software Engineer, Backend", "team": "Applied AI Engineering", "location": "San Francisco"}
 ]
 
-# Filter jobs based on the selected filters
-filtered_jobs = [job for job in jobs if (team_filter == "All teams" or team_filter in job["team"]) and (location_filter == "All locations" or location_filter in job["location"])]
+demo_job = [
+    {"title": "Software Engineer, Backend", "team": "Applied AI Engineering", "location": "San Francisco"}
+]
+
+if "filtered_jobs" not in st.session_state:
+    st.session_state.filtered_jobs = [job for job in jobs if (team_filter == "All teams" or team_filter in job["team"]) and (location_filter == "All locations" or location_filter in job["location"])]
 
 # Display the filtered job listings
-for job in filtered_jobs:
+for job in st.session_state.filtered_jobs:
     col1, col2, col3, col4, col5 = st.columns([1.5, 6, 2, 1, 1.5], vertical_alignment="center")
     with col2:
         st.write(f"**{job['title']}** {job['team']}")
@@ -47,20 +49,19 @@ for job in filtered_jobs:
         </div>
         """, unsafe_allow_html=True)
     with col4:
-        st.button("Apply now", key=job["title"])
+        apply = st.button("Apply now", key=job["title"])
+        if apply:
+            st.session_state.filtered_jobs = demo_job
 
-col1, col2, col3 = st.columns([1.5, 8, 1.5], vertical_alignment="center")
+col1, col2, col3 = st.columns([1.5, 8, 1.5], vertical_alignment="bottom")
 with col2:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-    if "openai_model" not in st.session_state:
-        st.session_state["openai_model"] = "gpt-3.5-turbo"
-
-    # Initialize chat history
+    st.file_uploader(
+        "Upload your resume and any other resources that you would like", accept_multiple_files=True
+    )
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "answeredQs" not in st.session_state:
-        st.session_state.answeredQs = {1,2}
+    if "curr" not in st.session_state:
+        st.session_state.curr = 0
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
@@ -68,32 +69,16 @@ with col2:
             st.markdown(message["content"])
 
     # Accept user input
-    if prompt := st.chat_input("Let's work together"):
+    if prompt := st.chat_input("Say hi to get started on your interview!"):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         # Display user message in chat message container
-
-        filtered_numbers = [num for num in list(range(0, len(questions))) if num not in st.session_state.answeredQs]
-        random_i = random.choice(filtered_numbers)
-        st.session_state.answeredQs.add(random_i)
-
         with st.chat_message("user"):
             st.markdown(prompt)
-        
-        with st.chat_message("system"):
-            messages_w_q = []
-            for m in st.session_state.messages:
-                new_message = {"role": m["role"], "content": m["content"]}
-                messages_w_q.append(new_message)
-            # messages_w_q[-1]["content"] = messages_w_q[-1]["content"] + questions[random_i]
-            stream = client.chat.completions.create(
-                model=st.session_state["openai_model"],
-                messages=messages_w_q,
-                stream=True,
-            )
-            response = st.write_stream(stream) 
-            question = st.write_stream(stream_questions)
-            print(messages_w_q)
 
-        st.session_state.messages.append({"role": "system", "content": response+" "+question}) #"Let's set up a call "+"https://calendly.com/naraharipranav/30min"})
-        
+        # Display assistant response in chat message container
+        with st.chat_message("assistant"):
+            response = st.write_stream(stream_data(st.session_state.curr))
+            st.session_state.curr += 1
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})

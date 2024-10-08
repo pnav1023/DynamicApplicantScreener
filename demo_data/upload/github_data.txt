@@ -1,0 +1,44 @@
+Repository Name: AI-Chatbot
+Owner: pnav1023
+Description: A Python-based AI chatbot that leverages Selenium and Python for web scraping to provide personalized recommendations.
+Language: Python
+Stars: 150
+Forks: 35
+Issues: 10
+Contributors: 5
+----------------------------------
+Repository Name: Blockchain-Escrow
+Owner: pnav1023
+Description: A smart contract solution for frictionless escrow using Solidity and Web3.
+Language: Solidity, Rust
+Stars: 85
+Forks: 20
+Issues: 3
+Contributors: 2
+----------------------------------
+Repository Name: Chess3.0
+Owner: pnav1023
+Description: A Web3 React.js app using the Ethereum blockchain to store game state and player data.
+Language: React.js, Solidity
+Stars: 120
+Forks: 25
+Issues: 5
+Contributors: 4
+----------------------------------
+Repository Name: Cloud-Migration-Automation
+Owner: pnav1023
+Description: Automating the migration of on-prem applications to AWS cloud using Python and AWS Lambda.
+Language: Python, TypeScript
+Stars: 95
+Forks: 18
+Issues: 7
+Contributors: 3
+----------------------------------
+Repository Name: dnAI
+Owner: pnav1023
+Description: A personalized AI chatbot that recommends supplements based on user genetic data.
+Language: Python, Streamlit
+Stars: 130
+Forks: 30
+Issues: 4
+Contributors: 6
