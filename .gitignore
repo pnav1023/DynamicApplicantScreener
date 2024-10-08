@@ -1,0 +1,5 @@
+.env
+myenv/*
+.streamlit/*
+__pycache__
+.DS_Store
